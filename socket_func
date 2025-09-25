@@ -1,0 +1,51 @@
+import smtplib
+
+# Sender Email goes here
+gmail_user = ''
+
+# Sender Email App Passkey
+gmail_pass = “”
+
+sent_from = gmail_user
+
+# Receiver email(s) go here as strings in a list
+to = ['']
+
+# Subject line of email
+subject = ""
+
+# Main chunk of text
+body = ""
+
+# Constructing the email
+email_text = """\
+From: %s
+To: %s
+Subject: %s
+
+%s
+""" % (sent_from, ", ".join(to), subject, body)
+
+
+try:
+    # Establish SSL connection over port 465 with gmail smtp server
+    # I tried using standard SMTP over port 587, but I kept running into
+    # server timeout issues
+    server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=10)
+    #server.starttls()
+    #server.ehlo()
+
+    # gmail requires you to login with an App Password that you set after
+    # enabling 2FA on the sending account
+    server.login(gmail_user, gmail_pass)
+    server.sendmail(sent_from, to, email_text)
+    server.close()
+    print ("Email sent!")
+
+# Error checking
+except smtplib.SMTPConnectError as e:
+    print(f"SMTP connection error: {e}")
+except smtplib.SMTPException as e:
+    print(f"SMTP error: {e}")
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
